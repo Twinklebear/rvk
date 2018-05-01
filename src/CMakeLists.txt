@@ -1,4 +1,4 @@
-add_library(rvk SHARED rvk_stub.cpp)
+add_library(rvk SHARED buffer.cpp)
 generate_export_header(rvk)
 set_property(TARGET rvk PROPERTY CXX_STANDARD_REQUIRED 11)
 
