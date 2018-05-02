@@ -18,10 +18,3 @@ void WriteBuffer::write(const char *data, const size_t nbytes) {
 	end += nbytes;
 }
 
-WriteBuffer& operator<<(WriteBuffer &b, const std::string &s) {
-	const uint64_t size = s.size();
-	b << size;
-	b.write(s.c_str(), size);
-	return b;
-}
-

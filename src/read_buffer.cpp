@@ -15,11 +15,3 @@ void ReadBuffer::read(char *out, const size_t nbytes) {
 	begin += nbytes;
 }
 
-ReadBuffer& operator>>(ReadBuffer &b, std::string &s) {
-	uint64_t size = 0;
-	b >> size;
-	s = std::string(size, '\0');
-	b.read(&s[0], size);
-	return b;
-}
-
