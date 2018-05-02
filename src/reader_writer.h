@@ -50,7 +50,7 @@ rvk::Writer& operator<<(rvk::Writer &b, const T &t) {
 
 template<typename T, typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
 rvk::Writer& operator<<(rvk::Writer &b, const std::vector<T> &t) {
-	const uint64_t size = s.size();
+	const uint64_t size = t.size();
 	b << size;
 	for (const auto &e : t) {
 		b << e;
