@@ -7,6 +7,8 @@
 namespace rvk {
 
 class RVK_EXPORT TCPStream : public Reader, Writer {
+	int socket;
+
 public:
 	// Connect to the host on the desired port
 	TCPStream(const std::string hostname, const uint16_t port);
