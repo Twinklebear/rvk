@@ -2,7 +2,8 @@ add_library(rvk SHARED
 	reader_writer.cpp write_buffer.cpp read_buffer.cpp
 	tcp.cpp)
 generate_export_header(rvk)
-set_property(TARGET rvk PROPERTY CXX_STANDARD_REQUIRED 14)
+set_property(TARGET rvk PROPERTY CXX_STANDARD 14)
+set_property(TARGET rvk PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_link_libraries(rvk PUBLIC TurboJpeg Snappy::snappy glm Threads::Threads)
 target_include_directories(rvk PUBLIC
