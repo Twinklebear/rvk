@@ -1,5 +1,6 @@
 #pragma once
 
 #include "rvk_export.h"
-#include "buffer.h"
+#include "read_stream.h"
+#include "write_stream.h"
 
