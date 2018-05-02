@@ -1,4 +1,6 @@
-add_library(rvk SHARED reader_writer.cpp write_buffer.cpp read_buffer.cpp)
+add_library(rvk SHARED
+	reader_writer.cpp write_buffer.cpp read_buffer.cpp
+	tcp.cpp)
 generate_export_header(rvk)
 set_property(TARGET rvk PROPERTY CXX_STANDARD_REQUIRED 14)
 
