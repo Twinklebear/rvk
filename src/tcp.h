@@ -24,6 +24,8 @@ public:
 };
 
 class RVK_EXPORT TCPListener {
+	int socket;
+
 public:
 	// Bind to a port on this host
 	TCPListener(const uint16_t port);
@@ -32,8 +34,8 @@ public:
 	TCPListener(const TCPListener&) = delete;
 	TCPListener& operator=(const TCPListener&) = delete;
 
-	// Listen for a new connection on the port and return it
-	TCPStream listen();
+	// Wait for a new connection on the port and return it
+	TCPStream accept();
 };
 
 }
