@@ -142,7 +142,7 @@ TCPListener::~TCPListener() {
 TCPStream TCPListener::accept() {
 	sockaddr_in peer_addr;
 	socklen_t len = sizeof(peer_addr);
-	int peer_sock = accept(socket, &peer_addr, &len);
+	int peer_sock = ::accept(socket, reinterpret_cast<sockaddr*>(&peer_addr), &len);
 	if (peer_sock == -1) {
 		std::cout << "Failed to accept peer socket\n";
 	}
