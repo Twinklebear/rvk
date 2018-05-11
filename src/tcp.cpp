@@ -5,7 +5,8 @@
 #include <iostream>
 
 #ifdef _WIN32
-#include <Winsock2.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #define SHUT_RDWR SD_BOTH
 #else
 #include <sys/socket.h>
@@ -48,6 +49,18 @@ void initialize() {
 void initialize() {}
 #endif
 
+static void close_socket(int socket) {
+	if (socket > -1) {
+		shutdown(socket, SHUT_RDWR);
+#ifdef _WIN32
+		closesocket(socket);
+#else
+		close(socket);
+#endif
+	}
+}
+
+TCPStream::TCPStream(int socket) : socket(socket) {}
 TCPStream::TCPStream(const std::string hostname, const uint16_t port) {
 	initialize();
 	addrinfo hints;
@@ -80,20 +93,20 @@ TCPStream::TCPStream(const std::string hostname, const uint16_t port) {
 #endif
 	}
 	freeaddrinfo(result);
+
+	// TODO: Setup some opts like nodelay and sigpipe no throw
 }
-TCPStream::TCPStream(const TCPStream&&) {
+TCPStream::TCPStream(TCPStream &&other) : socket(other.socket) {
+	other.socket = -1;
 }
-TCPStream& TCPStream::operator=(const TCPStream&&) {
+TCPStream& TCPStream::operator=(TCPStream &&rhs) {
+	close_socket(socket);
+	socket = rhs.socket;
+	rhs.socket = -1;
+	return *this;
 }
 TCPStream::~TCPStream() {
-	if (socket > -1) {
-		shutdown(socket, SHUT_RDWR);
-#ifdef _WIN32
-		closesocket(socket);
-#else
-		close(socket);
-#endif
-	}
+	close_socket(socket);
 }
 void TCPStream::read(char *data, const size_t nbytes) {
 }
@@ -137,7 +150,17 @@ TCPListener::TCPListener(const uint16_t port) {
 		std::cout << "Failed to listen on socket\n";
 	}
 }
+TCPListener::TCPListener(TCPListener &&other) : socket(other.socket) {
+	other.socket = -1;
+}
+TCPListener& TCPListener::operator=(TCPListener &&rhs) {
+	close_socket(socket);
+	socket = rhs.socket;
+	rhs.socket = -1;
+	return *this;
+}
 TCPListener::~TCPListener() {
+	close_socket(socket);
 }
 TCPStream TCPListener::accept() {
 	sockaddr_in peer_addr;
@@ -146,6 +169,9 @@ TCPStream TCPListener::accept() {
 	if (peer_sock == -1) {
 		std::cout << "Failed to accept peer socket\n";
 	}
+
 	// TODO: Setup some opts like nodelay and sigpipe no throw
+
+	return TCPStream(peer_sock);
 }
 

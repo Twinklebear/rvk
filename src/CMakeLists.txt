@@ -6,6 +6,10 @@ set_property(TARGET rvk PROPERTY CXX_STANDARD 14)
 set_property(TARGET rvk PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_link_libraries(rvk PUBLIC TurboJpeg Snappy::snappy glm Threads::Threads)
+if (WIN32)
+	target_link_libraries(rvk PUBLIC wsock32 ws2_32)
+endif()
+
 target_include_directories(rvk PUBLIC
 	$<BUILD_INTERFACE:${rvk_BINARY_DIR}>
 	$<BUILD_INTERFACE:${rvk_SOURCE_DIR}>

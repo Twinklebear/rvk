@@ -9,11 +9,15 @@ namespace rvk {
 class RVK_EXPORT TCPStream : public Reader, Writer {
 	int socket;
 
+private:
+	TCPStream(int socket);
+	friend class TCPListener;
+
 public:
 	// Connect to the host on the desired port
 	TCPStream(const std::string hostname, const uint16_t port);
-	TCPStream(const TCPStream&&);
-	TCPStream& operator=(const TCPStream&&);
+	TCPStream(TCPStream &&other);
+	TCPStream& operator=(TCPStream &&rhs);
 	~TCPStream();
 
 	TCPStream(const TCPStream&) = delete;
@@ -29,6 +33,8 @@ class RVK_EXPORT TCPListener {
 public:
 	// Bind to a port on this host
 	TCPListener(const uint16_t port);
+	TCPListener(TCPListener &&other);
+	TCPListener& operator=(TCPListener &&rhs);
 	~TCPListener();
 
 	TCPListener(const TCPListener&) = delete;
