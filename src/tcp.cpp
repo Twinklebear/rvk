@@ -109,8 +109,18 @@ TCPStream::~TCPStream() {
 	close_socket(socket);
 }
 void TCPStream::read(char *data, const size_t nbytes) {
+	const auto res = recv(socket, data, nbytes, 0);
+	if (res != nbytes) {
+		std::cerr << "Failed to read on TCPStream" << std::endl;
+		throw std::runtime_error("Failed to read on TCPStream");
+	}
 }
 void TCPStream::write(const char *data, const size_t nbytes) {
+	const auto res = send(socket, data, nbytes, 0);
+	if (res != nbytes) {
+		std::cerr << "Failed to write on TCPStream" << std::endl;
+		throw std::runtime_error("Failed to write on TCPStream");
+	}
 }
 
 TCPListener::TCPListener(const uint16_t port) {
