@@ -20,4 +20,5 @@ find_package(Snappy REQUIRED)
 find_package(glm REQUIRED)
 
 add_subdirectory(src)
+add_subdirectory(tests)
 
