@@ -6,11 +6,11 @@
 
 namespace rvk {
 
-class RVK_EXPORT TCPStream : public Reader, Writer {
+class RVK_EXPORT TCPStream : public Reader, public Writer {
 	int socket;
 
 private:
-	TCPStream(int socket);
+	explicit TCPStream(int socket);
 	friend class TCPListener;
 
 public:

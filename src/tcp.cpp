@@ -66,7 +66,7 @@ TCPStream::TCPStream(const std::string hostname, const uint16_t port) {
 	addrinfo hints;
 	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_socktype = SOCK_STREAM;
 
 	// TODO WILL: What do we include for getaddrinfo in winsock?
 	addrinfo *result = nullptr;
@@ -77,14 +77,14 @@ TCPStream::TCPStream(const std::string hostname, const uint16_t port) {
 		throw std::runtime_error("getaddrinfo failed with host '" + hostname
 				+ "' and port " + service);
 	}
+
 	for (addrinfo *ad = result; ad != nullptr; ad = ad->ai_next) {
-		std::cout << "Testing port socket\n";
 		socket = ::socket(ad->ai_family, ad->ai_socktype, ad->ai_protocol);
 		if (socket == -1) {
 			continue;
 		}
 		if (connect(socket, ad->ai_addr, ad->ai_addrlen) != -1) {
-			std::cout << "Connected socket\n";
+			break;
 		}
 #ifdef _WIN32
 		closesocket(socket);
@@ -111,14 +111,12 @@ TCPStream::~TCPStream() {
 void TCPStream::read(char *data, const size_t nbytes) {
 	const auto res = recv(socket, data, nbytes, 0);
 	if (res != nbytes) {
-		std::cerr << "Failed to read on TCPStream" << std::endl;
 		throw std::runtime_error("Failed to read on TCPStream");
 	}
 }
 void TCPStream::write(const char *data, const size_t nbytes) {
 	const auto res = send(socket, data, nbytes, 0);
 	if (res != nbytes) {
-		std::cerr << "Failed to write on TCPStream" << std::endl;
 		throw std::runtime_error("Failed to write on TCPStream");
 	}
 }
@@ -128,7 +126,7 @@ TCPListener::TCPListener(const uint16_t port) {
 	addrinfo hints;
 	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
 	// TODO WILL: What do we include for getaddrinfo in winsock?
@@ -136,17 +134,15 @@ TCPListener::TCPListener(const uint16_t port) {
 	const std::string service = std::to_string(port);
 	const int err = getaddrinfo(nullptr, service.c_str(), &hints, &result);
 	if (err != 0) {
-		std::cerr << "TCPListener: Error in getaddrinfo: " << gai_strerror(err) << std::endl;
 		throw std::runtime_error("getaddrinfo failed with port " + service);
 	}
 	for (addrinfo *ad = result; ad != nullptr; ad = ad->ai_next) {
-		std::cout << "Testing port socket\n";
 		socket = ::socket(ad->ai_family, ad->ai_socktype, ad->ai_protocol);
 		if (socket == -1) {
 			continue;
 		}
 		if (bind(socket, ad->ai_addr, ad->ai_addrlen) != -1) {
-			std::cout << "Bound to socket\n";
+			break;
 		}
 #ifdef _WIN32
 		closesocket(socket);
@@ -157,7 +153,7 @@ TCPListener::TCPListener(const uint16_t port) {
 	freeaddrinfo(result);
 
 	if (listen(socket, 4) != 0) {
-		std::cout << "Failed to listen on socket\n";
+		throw std::runtime_error("Failed to listen on socket");
 	}
 }
 TCPListener::TCPListener(TCPListener &&other) : socket(other.socket) {
@@ -173,15 +169,12 @@ TCPListener::~TCPListener() {
 	close_socket(socket);
 }
 TCPStream TCPListener::accept() {
-	sockaddr_in peer_addr;
-	socklen_t len = sizeof(peer_addr);
-	int peer_sock = ::accept(socket, reinterpret_cast<sockaddr*>(&peer_addr), &len);
+	int peer_sock = ::accept(socket, NULL, NULL);
 	if (peer_sock == -1) {
-		std::cout << "Failed to accept peer socket\n";
+		throw std::runtime_error("Failed to accept peer socket");
 	}
 
 	// TODO: Setup some opts like nodelay and sigpipe no throw
-
 	return TCPStream(peer_sock);
 }
 
