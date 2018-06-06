@@ -10,7 +10,7 @@ WriteBuffer::WriteBuffer(const size_t initial_capacity)
 	: end(0), buffer(initial_capacity, 0)
 {}
 void WriteBuffer::write(const char *data, const size_t nbytes) {
-	if (end + nbytes >= buffer.size()) {
+	if (end + nbytes > buffer.size()) {
 		buffer.resize(std::max(size_t(std::ceil(buffer.size() * 1.5)),
 					buffer.size() + nbytes));
 	}
